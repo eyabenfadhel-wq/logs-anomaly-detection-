@@ -1,0 +1,26 @@
+[project]
+name = "code"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "miniprojet"}
+]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "matplotlib (==3.7.2)",
+    "numpy (>=1.24,<2.0)",
+    "pandas (==1.5.3)",
+    "scikit-learn (==1.2.2)",
+    "faker (==37.8.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "ipykernel (>=6.30.1,<7.0.0)"
+]
