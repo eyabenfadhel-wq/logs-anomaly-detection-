@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
-from logs.constant import Constant
+from constant import Constant
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 class LogPreprocessor:
