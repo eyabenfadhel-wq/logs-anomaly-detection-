@@ -1,19 +1,18 @@
 
-import sys
-import os
-
 import pandas as pd
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
-from constant import Constant
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from logs.constant import Constant
+
 
 class LogPreprocessor:
     
     def __init__(self):
         self.preprocessor = None
-                
+        
+    
+    
     def parse_features(self, df) -> pd.DataFrame:
         
         df['status_code'] = df['status_code'].astype(str)
