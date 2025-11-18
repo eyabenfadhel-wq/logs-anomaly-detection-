@@ -1,0 +1,77 @@
+
+services:
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - monitoring
+    command: redis-server --appendonly yes
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    restart: unless-stopped
+    ports:
+      - "80:80" #http
+      - "443:433" #https
+      - "8080:8080" #dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/dynamic_conf.yml:/etc/traefik/dynamic_conf.yml:ro
+    networks:
+      - monitoring
+    command: 
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=80"
+      - "--entrypoints.websecure.address=443"
+      - "--log.level=DEBUG"
+
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    
+    container_name: anomaly_detector
+    networks:
+      - monitoring
+    depends_on:
+      - traefik
+    labels:
+      - "traefic.enable=true"
+      - "traefic.http.routers.fastapi.rule=Host('api.localhost')"
+      - "traefic.http.routers.fastapi.entrypoints=web"
+      - "traefic.http.services.fastapi.loadbalancer.server.port=8000"
+
+  dozzel:
+    image: amir20/dozzel:latest
+    container_name: dozzel
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - monitoring
+    labels:
+      - "traefic.enable=true"
+      - "traefic.http.routers.dozzel=Host('dozzel.localhost')"
+      - "traefic.http.routers.dozzel.entrypoints=web"
+      - "traefic.http.services.dozzel.loadbalancer.server.port=8000"
+    environment:
+      DOZZEL_ENABLE_ACTIONS: "true"
+
+
+
+
+
+networks:
+  monitoring:
+    driver: bridge
+
+volumes:
+  redis_data:
